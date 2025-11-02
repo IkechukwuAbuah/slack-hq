@@ -28,7 +28,7 @@ Slack HQ is a documentation-first project management system that coordinates AI 
 
 - **Linear Workspace**: [SLHQ Team](https://linear.app/ikechukwu-abuah/team/SLHQ) - Project management and issue tracking
 - **Notion Knowledge Base**: [Slack-HQ Docs](https://www.notion.so/slack-hq-docs) *(Update with your actual Notion workspace URL)*
-- **GitHub Repository**: [slack-hq](https://github.com/yourusername/slack-hq) *(Update with your actual GitHub URL)*
+- **GitHub Repository**: [IkechukwuAbuah/slack-hq](https://github.com/IkechukwuAbuah/slack-hq)
 - **Repository**: Current directory
 
 ## Directory Structure
