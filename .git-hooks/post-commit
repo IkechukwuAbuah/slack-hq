@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Post-commit hook to remind about documentation sync
+# This is a gentle reminder, not a blocker
+
+# Count significant changes in last 10 commits
+SIGNIFICANT_CHANGES=$(git log --oneline -10 --name-status | grep -E "^(A|D|R)" | wc -l)
+
+# If many files added/deleted/renamed, suggest sync
+if [ "$SIGNIFICANT_CHANGES" -gt 15 ]; then
+    echo ""
+    echo "📝 Tip: Significant structural changes detected."
+    echo "   Consider running: /sync-docs"
+    echo ""
+fi
+
+# Check if package.json or build configs changed recently
+CONFIG_CHANGES=$(git log --oneline -5 --name-only | grep -E "(package\.json|requirements\.txt|Cargo\.toml|go\.mod|build\.|vite\.config|webpack\.config)" | wc -l)
+
+if [ "$CONFIG_CHANGES" -gt 0 ]; then
+    echo ""
+    echo "📝 Tip: Build configuration changed."
+    echo "   Consider running: /sync-docs"
+    echo ""
+fi

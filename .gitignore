@@ -1,0 +1,65 @@
+# Slack-HQ .gitignore
+
+# Temporary files
+*.tmp
+*.temp
+*~
+.DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Node modules (if we add any JavaScript tools)
+node_modules/
+package-lock.json
+
+# Python virtual environments
+venv/
+env/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Build outputs
+dist/
+build/
+*.docx.tmp
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Notion exports (only keep markdown sources)
+*.notion-export/
+
+# Test files and temporary conversions
+test-*.md
+test-*.docx
+temp-*.md
+temp-*.docx
+
+# Context and cache
+.context/
+.cache/
+
+# Secrets and credentials
+secrets.json
+credentials.json
+*.key
+*.pem
