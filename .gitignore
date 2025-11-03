@@ -54,6 +54,20 @@ test-*.docx
 temp-*.md
 temp-*.docx
 
+# Artifacts - track structure, ignore contents
+artifacts/**/*
+!artifacts/README.md
+!artifacts/.gitkeep
+!artifacts/chatgpt/
+!artifacts/chatgpt/README.md
+!artifacts/chatgpt/.gitkeep
+!artifacts/claude/
+!artifacts/claude/README.md
+!artifacts/claude/.gitkeep
+
+# Exception: Allow specific artifact types if needed for examples
+# artifacts/**/example-*.md
+
 # Context and cache
 .context/
 .cache/
@@ -63,3 +77,8 @@ secrets.json
 credentials.json
 *.key
 *.pem
+temp-context/secrets.md
+
+# Claude Code runtime data
+.claude/mcp.json
+.claude/data/

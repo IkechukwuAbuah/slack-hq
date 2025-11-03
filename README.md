@@ -39,21 +39,57 @@ slack-hq/
 ├── CLAUDE.md                 # Claude Code instructions
 ├── TOOL-REGISTRY.md          # Comprehensive tool and API catalog
 ├── AGENTS.md                 # AI agent configuration
-├── agents/
+├── manifest.yml              # Slack app configuration (Council Bot)
+├── .env.example              # Environment variables template
+│
+├── agents/                   # AI agent coordination
 │   ├── agents.md            # Worker registry and handoff rules
-│   └── claude.md            # Claude-specific instructions
-├── docs/
+│   ├── claude.md            # Claude-specific instructions
+│   ├── council-bot-reference.md # Council Bot integration guide
+│   ├── prompts/             # Reusable prompt library
+│   │   └── README.md        # Prompts usage guide
+│   └── registry/            # Agent metadata registry
+│       └── README.md        # Registry documentation
+│
+├── docs/                     # Documentation (markdown SSOT)
 │   ├── templates/           # Document templates
-│   │   ├── spec.md
-│   │   ├── adr.md
-│   │   └── runbook.md
+│   │   ├── spec.md          # Feature specification template
+│   │   ├── adr.md           # Architecture Decision Record template
+│   │   └── runbook.md       # Operational runbook template
 │   ├── specs/               # Feature specifications
 │   ├── adrs/                # Architecture Decision Records
-│   └── runbooks/            # Operational procedures
-└── scripts/
-    └── convert.sh           # Markdown ↔ DOCX conversion utility
-
+│   ├── runbooks/            # Operational procedures
+│   ├── guides/              # Implementation guides
+│   ├── setup/               # Setup documentation
+│   ├── testing/             # Testing documentation
+│   └── research/            # Research and explorations
+│
+├── artifacts/                # AI-generated documents (gitignored)
+│   ├── README.md            # Artifacts policy and usage
+│   ├── chatgpt/             # ChatGPT outputs (.docx, .pdf)
+│   │   └── README.md
+│   └── claude/              # Claude outputs (.md, .txt)
+│       └── README.md
+│
+├── scripts/                  # Automation utilities
+│   ├── convert.sh           # Markdown ↔ DOCX conversion
+│   ├── slack-setup.sh       # Council Bot deployment
+│   └── post-to-slack.sh     # Slack messaging utility
+│
+├── .claude/                  # Claude Code configuration
+│   ├── commands/            # Custom slash commands
+│   ├── skills/              # Project-specific skills
+│   ├── agents/              # Subagent definitions
+│   └── data/                # Runtime data (gitignored)
+│
+└── logs/                     # Session logs and telemetry (gitignored)
 ```
+
+**Key Principles:**
+- **Markdown is source** - All canonical documentation in `.md`
+- **Artifacts are derivatives** - Generated files live in `/artifacts`
+- **Structure is tracked** - Directories committed, most contents gitignored
+- **Templates are reusable** - Use `/docs/templates` for new documents
 
 ## Key Documentation
 
@@ -121,6 +157,8 @@ slack-hq/
 
 ## Slack CLI Setup (Council Bot)
 
+> **Note:** Slack CLI v3.9.0 is for app development (manifest validation, authentication, deployment). For Slack operations (posting messages, reading channels, managing users), use **Slack MCP**. See [TOOL-REGISTRY.md](TOOL-REGISTRY.md) for `mcp__slack__*` functions.
+
 ### Prerequisites
 
 - macOS with Homebrew
@@ -154,15 +192,15 @@ slack-hq/
    ```
 
 5. **Test the connection**:
-   ```bash
-   SLACK_BOT_TOKEN=your-token slack api auth.test
-   ```
+
+   Test with Slack MCP: See [TOOL-REGISTRY.md](TOOL-REGISTRY.md) for `mcp__slack__*` functions like `slack_post_message`, `slack_list_channels`, etc.
 
 ### Usage
 
 See docs/slack-cli-capabilities.md for:
-- Full list of available capabilities
-- CLI command examples
+- Full list of available capabilities (both Slack MCP and CLI)
+- MCP function reference and examples
+- CLI commands for app development
 - AI agent integration patterns
 - Troubleshooting guide
 
