@@ -1,0 +1,22 @@
+{
+  "tool_name": "Example Tool",
+  "tool_slug": "example-tool",
+  "category": "Other",
+  "description": "Tool description goes here",
+  "linear": {
+    "team": "SLHQ",
+    "project": "Slack-HQ Foundation & Setup",
+    "title": "Tool Registry: Example Tool",
+    "labels": ["Tool Registry", "Infrastructure"],
+    "priority": 3,
+    "description": "## Tool Information\n\n**Tool Name:** Example Tool\n**Tool ID:** example-tool\n**Category:** Other\n**Status:** Proposed\n\n**Description:** Tool description goes here\n\n## Use Cases\n\n1. [Use case 1]\n2. [Use case 2]\n\n## Implementation Checklist\n\n### Triage Phase\n- [ ] Owner assigned\n- [ ] Backup Owner assigned\n- [ ] Security review completed\n\n### Staging Phase\n- [ ] Environment setup\n- [ ] Tests passed\n\n### Deploy Phase\n- [ ] Production deployment\n- [ ] Health check validated\n\n### Announce Phase\n- [ ] Registry updated\n- [ ] Slack announcement posted\n\n### Review Phase\n- [ ] 30-day review scheduled"
+  },
+  "registry_entry": {
+    "status": "🟡 Proposed",
+    "purpose": "Tool description",
+    "use_cases": ["Use case 1", "Use case 2"],
+    "capabilities": ["Capability 1", "Capability 2"],
+    "risk_level": "Medium",
+    "data_classification": "Internal"
+  }
+}

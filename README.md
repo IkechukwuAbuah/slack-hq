@@ -37,6 +37,8 @@ Slack HQ is a documentation-first project management system that coordinates AI 
 slack-hq/
 ├── README.md                 # This file
 ├── CLAUDE.md                 # Claude Code instructions
+├── TOOL-REGISTRY.md          # Comprehensive tool and API catalog
+├── AGENTS.md                 # AI agent configuration
 ├── agents/
 │   ├── agents.md            # Worker registry and handoff rules
 │   └── claude.md            # Claude-specific instructions
@@ -52,6 +54,13 @@ slack-hq/
     └── convert.sh           # Markdown ↔ DOCX conversion utility
 
 ```
+
+## Key Documentation
+
+- **[TOOL-REGISTRY.md](TOOL-REGISTRY.md)** - Comprehensive catalog of all available tools, APIs, MCP servers, CLI tools, and integrations. Check here first when looking for capabilities.
+- **[CLAUDE.md](CLAUDE.md)** - Instructions for Claude Code and other AI agents working in this repository
+- **[AGENTS.md](AGENTS.md)** - AI agent configuration and orchestration
+- **[docs/slack-cli-capabilities.md](docs/slack-cli-capabilities.md)** - Detailed Slack API reference and Council Bot capabilities
 
 ## Getting Started
 
@@ -110,9 +119,58 @@ slack-hq/
 3. Update templates if you discover better patterns
 4. Keep SSOT policy: markdown is source, everything else is derivative
 
+## Slack CLI Setup (Council Bot)
+
+### Prerequisites
+
+- macOS with Homebrew
+- Slack CLI installed: `brew install --cask slack-cli`
+- Admin/App Manager access to "The Council" Slack workspace
+
+### Installation Steps
+
+1. **Authenticate CLI** with your Slack workspace "The Council":
+   ```bash
+   slack login
+   slack auth list
+   ```
+
+2. **Run the setup script**:
+   ```bash
+   cd /Users/x/Downloads/slack-hq
+   ./scripts/slack-setup.sh
+   ```
+
+3. **Complete the OAuth install** in the browser when prompted
+
+4. **Configure environment**:
+   ```bash
+   cp .env.example .env
+   # Edit .env and fill in:
+   # - SLACK_BOT_TOKEN (from OAuth & Permissions page)
+   # - SLACK_SIGNING_SECRET (from Basic Information page)
+   # - SLACK_APP_TOKEN (from App-Level Tokens)
+   # - SLACK_WORKSPACE_ID (from workspace settings)
+   ```
+
+5. **Test the connection**:
+   ```bash
+   SLACK_BOT_TOKEN=your-token slack api auth.test
+   ```
+
+### Usage
+
+See docs/slack-cli-capabilities.md for:
+- Full list of available capabilities
+- CLI command examples
+- AI agent integration patterns
+- Troubleshooting guide
+
 ## Support
 
 - Documentation questions: Check `/docs/templates/` for examples
 - Agent coordination: See `/agents/agents.md`
 - Claude usage: See `/agents/claude.md`
+- Slack integration: See `docs/slack-cli-capabilities.md`
+- Council Bot for AI agents: See `/agents/council-bot-reference.md`
 - Linear issues: [Your Linear workspace URL]

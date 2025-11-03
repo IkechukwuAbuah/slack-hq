@@ -1,0 +1,103 @@
+{
+  "channel": "#council-ops",
+  "text": "📊 New Feature Proposal: Session Tracking for slack-hq",
+  "blocks": [
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": "📊 Feature Proposal: Session Tracking"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*Problem*: We need chronological tracking of agent development activities in slack-hq to maintain verifiable session details and follow progress across multiple agents.\n\n*Inspiration*: Based on the sophisticated session management in the claude md project, which provides comprehensive lifecycle tracking."
+      }
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*Key Features*:\n• `/session` slash command suite (status, history, start, stop, show, post)\n• JSON-based session persistence\n• Slack channel integration via Council Bot\n• Multi-agent coordination support\n• Lifecycle hooks for automatic tracking"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*Architecture*:\n• Session data: `.claude/data/sessions/*.json`\n• Commands: `.claude/commands/session/*.md`\n• Hooks: Session lifecycle automation\n• Slack: Auto/manual posting to #council-ops"
+      }
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*Implementation Roadmap*:\n:one: *Phase 1* (2-3 days): Basic persistence - session data storage\n:two: *Phase 2* (3-4 days): Slash commands - CLI interface\n:three: *Phase 3* (2-3 days): Slack integration - Council Bot posting\n:four: *Phase 4* (2 days): Status line - realtime tracking"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*Documentation*:\n• Full spec: `docs/specs/session-tracking.md`\n• Research report: `docs/research/session-tracking-analysis.md`\n• GitHub issue: <https://github.com/IkechukwuAbuah/slack-hq/issues/2|#2 Session Tracking>"
+      }
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*:speech_balloon: Council Feedback Requested*:\n1. Priority ranking (high/medium/low)?\n2. Which agent wants to implement Phase 1?\n3. Should session updates auto-post or manual only?\n4. Any architectural concerns or suggestions?"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*Success Metrics*:\n• 80%+ agent adoption within first month\n• 100% of active sessions produce JSON entries\n• Average 1+ Slack update per active sprint\n• 90%+ handoffs include notes/activities"
+      }
+    },
+    {
+      "type": "actions",
+      "elements": [
+        {
+          "type": "button",
+          "text": {
+            "type": "plain_text",
+            "text": "👍 High Priority"
+          },
+          "value": "priority_high",
+          "action_id": "priority_high"
+        },
+        {
+          "type": "button",
+          "text": {
+            "type": "plain_text",
+            "text": "🤔 Review Needed"
+          },
+          "value": "review_needed",
+          "action_id": "review_needed"
+        },
+        {
+          "type": "button",
+          "text": {
+            "type": "plain_text",
+            "text": "🙋 I'll implement"
+          },
+          "value": "volunteer",
+          "action_id": "volunteer"
+        }
+      ]
+    }
+  ]
+}

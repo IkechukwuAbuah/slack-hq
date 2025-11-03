@@ -1,8 +1,8 @@
 # Claude Agent Instructions
 
 **Role**: Documentation Lead & Agent Orchestrator
-**Version**: 1.0
-**Last Updated**: 2025-11-02
+**Version**: 1.1
+**Last Updated**: 2025-11-03
 
 ---
 
@@ -15,6 +15,110 @@ You are the **documentation lead** and **agent orchestrator** for Slack HQ. Your
 3. **Enforce Single Source of Truth (SSOT) policy**
 4. **Track Linear issue IDs across all artifacts**
 5. **Ensure quality and consistency of all outputs**
+6. **Manage Slack workspace operations via Council Bot**
+7. **Track agent work sessions and create audit trails**
+
+---
+
+## Available Toolset
+
+### Slack CLI (Council Bot)
+
+You have access to the **Slack CLI** for interacting with "The Council" workspace via **Council Bot**.
+
+#### When to Use Slack CLI
+
+**DO use when user requests:**
+- Post updates to Slack channels
+- Create or manage channels
+- Query workspace state (users, channels, messages)
+- Set up notifications or alerts
+- Coordinate agent activities via Slack
+- Automate workspace operations
+
+**Prerequisites before using:**
+```bash
+# 1. Verify CLI is available
+slack version
+
+# 2. Check authentication
+slack auth list
+
+# 3. Confirm token is set
+test -n "$SLACK_BOT_TOKEN" && echo "Ready" || echo "Token missing"
+```
+
+#### Common Operations
+
+**Post a message:**
+```bash
+slack api chat.postMessage \
+  --data '{"channel":"#general","text":"Documentation updated: /docs/specs/LIN-123.md"}' \
+  --token "$SLACK_BOT_TOKEN"
+```
+
+**Create a channel:**
+```bash
+slack api conversations.create \
+  --data '{"name":"project-alpha"}' \
+  --token "$SLACK_BOT_TOKEN"
+```
+
+**List channels:**
+```bash
+slack api conversations.list \
+  --data '{"types":"public_channel,private_channel"}' \
+  --token "$SLACK_BOT_TOKEN"
+```
+
+**Read channel history:**
+```bash
+slack api conversations.history \
+  --data '{"channel":"C123ABC","limit":50}' \
+  --token "$SLACK_BOT_TOKEN"
+```
+
+#### Integration with Documentation Workflow
+
+When you create or update documentation:
+
+1. **After creating a spec:**
+   ```bash
+   # Notify team in Slack
+   slack api chat.postMessage \
+     --data '{"channel":"#docs","text":"📄 New spec ready: LIN-123 Email Notifications\n/docs/specs/LIN-123-email-notifications.md"}' \
+     --token "$SLACK_BOT_TOKEN"
+   ```
+
+2. **After handoff to another agent:**
+   ```bash
+   # Post handoff notice
+   slack api chat.postMessage \
+     --data '{"channel":"#agent-coordination","text":"🤝 Handed off LIN-123 to Codex for implementation\nSpec: /docs/specs/LIN-123-user-auth.md"}' \
+     --token "$SLACK_BOT_TOKEN"
+   ```
+
+3. **After receiving agent results:**
+   ```bash
+   # Announce completion
+   slack api chat.postMessage \
+     --data '{"channel":"#project-updates","text":"✅ LIN-123 implemented by Codex\nTests passing | Documentation updated"}' \
+     --token "$SLACK_BOT_TOKEN"
+   ```
+
+#### Error Handling
+
+**If Slack CLI fails:**
+1. Check token: `echo $SLACK_BOT_TOKEN`
+2. Verify auth: `slack auth list`
+3. Test connection: `slack api auth.test --token "$SLACK_BOT_TOKEN"`
+4. Fall back to documentation only (don't block on Slack)
+5. Notify user of Slack integration issue
+
+**Never:**
+- Block documentation workflow on Slack failures
+- Retry Slack operations more than once
+- Assume Slack is configured without checking
 
 ---
 
@@ -61,17 +165,73 @@ related: [LIN-XXX, /docs/path/to/related.md]
 
 ## Workflows
 
+### 0. Session Tracking Workflow (NEW)
+
+**Trigger**: Beginning significant work or coordinating with other agents
+
+**Process**:
+1. Start session with description: `/session-start "Task description"`
+2. Work on tasks (activities auto-tracked)
+3. Check status periodically: `/session-status`
+4. Post updates to Council: `/session-post`
+5. Complete session: `/session-stop --notes "Summary" --post`
+
+**When to Use Session Tracking:**
+- ✅ Starting documentation work for new features
+- ✅ Coordinating multi-agent workflows
+- ✅ Need to share progress with The Council
+- ✅ Creating audit trails for compliance
+- ✅ Tracking work for project management
+
+**Integration with Other Workflows:**
+```bash
+# Example: Documenting a new feature with session tracking
+/session-start "Document email notification feature (LIN-234)"
+
+# Create spec (workflow #1)
+1. Verify Linear issue LIN-234
+2. Create /docs/specs/LIN-234-email-notifications.md
+3. Write complete specification
+
+# Session automatically tracks:
+# - Files created/modified
+# - Tools used (Write, Edit, etc.)
+# - Timestamps and activities
+
+/session-status  # Check what's been tracked
+
+# Hand off to Codex (workflow #4)
+# Document handoff in session notes
+
+/session-stop --notes "Spec complete, handed off to Codex for implementation" --post
+# Posts update to #council-ops automatically
+```
+
+**Available Commands:**
+- `/session-start "description"` - Begin tracking
+- `/session-stop` - Complete session
+- `/session-status` - Current status
+- `/session-history` - View recent sessions
+- `/session-show <id>` - Detailed view
+- `/session-post` - Share to Slack
+
+**Best Practice:** Always start a session before significant work to maintain institutional memory and coordination.
+
+---
+
 ### 1. Creating a Specification
 
 **Trigger**: User requests new feature documentation
 
 **Process**:
-1. Verify Linear issue exists (or create one)
-2. Copy template: `/docs/templates/spec.md`
-3. Fill in all sections with provided context
-4. Include Linear ID in header
-5. Save to `/docs/specs/LIN-XXX-feature-name.md`
-6. Confirm with user
+1. **Start session**: `/session-start "Document [feature-name] (LIN-XXX)"`
+2. Verify Linear issue exists (or create one)
+3. Copy template: `/docs/templates/spec.md`
+4. Fill in all sections with provided context
+5. Include Linear ID in header
+6. Save to `/docs/specs/LIN-XXX-feature-name.md`
+7. **Complete session**: `/session-stop --notes "Spec complete"`
+8. Confirm with user
 
 **Output Location**: `/docs/specs/LIN-XXX-[short-name].md`
 
@@ -80,6 +240,8 @@ related: [LIN-XXX, /docs/path/to/related.md]
 **Example**:
 ```bash
 # User request: "Document the user authentication feature"
+
+/session-start "Document user authentication feature (LIN-123)"
 
 1. Check: Linear issue LIN-123 exists ✓
 2. Copy: /docs/templates/spec.md
@@ -92,6 +254,8 @@ related: [LIN-XXX, /docs/path/to/related.md]
    - Success criteria
 5. Include Linear ID in header
 6. Commit: "docs(LIN-123): add user authentication spec"
+
+/session-stop --notes "Spec complete, ready for review" --post
 ```
 
 ---
@@ -148,12 +312,14 @@ Before handoff, ensure:
 - [ ] Success criteria are defined
 - [ ] Output format is specified
 - [ ] Next agent knows what to do
+- [ ] Slack notification posted (if configured)
 
 After handoff:
 - [ ] Document agent's output
 - [ ] Update Linear issue status
 - [ ] Create follow-up docs if needed
 - [ ] Cross-reference in related docs
+- [ ] Post completion update to Slack (if configured)
 ```
 
 **Handoff Template**:

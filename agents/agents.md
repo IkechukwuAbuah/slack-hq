@@ -10,6 +10,7 @@ This document defines all AI agents/workers in the Slack HQ system, their respon
 | **Gemini** | Codebase Analysis | Large-scale code analysis, pattern detection, architecture review | Claude (docs), Codex (fixes) |
 | **Codex** | Implementation | Feature development, bug fixes, test writing, refactoring | Claude (documentation) |
 | **Cursor** | Interactive Development | Iterative coding, debugging sessions, exploratory work | Claude (finalization) |
+| **Session-Tracker** | Session Management | Track agent activities, manage workflows, create audit trails, Slack updates | Claude (documentation), All agents (coordination) |
 
 ---
 
@@ -220,6 +221,75 @@ cursor-agent "debug: API returns 500 on POST /users"
 
 ---
 
+### Session-Tracker (Workflow Manager)
+
+**Purpose**: Track agent activities, manage collaborative workflows, and create audit trails with Slack integration
+
+**Capabilities**:
+- Session lifecycle management (start, stop, pause, resume)
+- JSON schema validation and storage
+- CLI command implementation (`/session` commands)
+- Slack integration for progress updates
+- Multi-agent coordination and handoff tracking
+- Activity logging and audit trails
+
+**Standard Prompt**:
+```
+Session: [start|stop|status|history|show|post]
+Task: [description]
+Linear ID: LIN-XXX (optional)
+Auto-post: [yes|no]
+Channel: [#council-ops|other]
+Requirements:
+- Follow session tracking spec
+- Validate JSON against schema
+- Include agent metadata
+- Track file modifications
+```
+
+**Handoff Rules**:
+- **From any agent**: Receives session tracking requests
+- **To Claude**: Returns session summary for documentation
+- **To Slack**: Posts updates to configured channels
+- **Triggers automatically**: When agents need workflow coordination
+
+**Key Behaviors**:
+1. **Proactive Session Creation**: Suggests starting sessions for significant work
+2. **Schema Validation**: Always validates JSON before persisting
+3. **Slack Threading**: Maintains conversation context in Slack threads
+4. **Concurrent Support**: Handles multiple agents working simultaneously
+5. **Privacy-First**: Session data gitignored, only summaries shared
+
+**Example Commands**:
+```bash
+# Start a new session
+/session start "Implement authentication" --auto-post --channel #council-ops
+
+# Check current status
+/session status
+
+# Post update to Slack
+/session post --summary "Tests passing, ready for review"
+
+# Stop session
+/session stop --notes "Feature complete, documented"
+```
+
+**Data Structure**:
+- Storage: `.claude/data/sessions/{uuid}.json`
+- Schema: `config/schemas/session.json`
+- Validation: JSON Schema v7 strict mode
+- Naming: UUID v4 for unique identification
+
+**Integration Points**:
+- **Claude**: Documents session outcomes
+- **Codex/Cursor**: Track implementation sessions
+- **Gemini**: Track analysis sessions
+- **Slack**: Progress updates and milestone announcements
+- **Linear**: Issue tracking via Linear IDs
+
+---
+
 ## Handoff Protocols
 
 ### Protocol 1: Spec → Implementation
@@ -298,6 +368,80 @@ cursor-agent "debug: API returns 500 on POST /users"
    - Monitoring guidelines
 ```
 
+### Protocol 4: Session Tracking for All Workflows
+
+**Purpose**: Maintain institutional memory and coordination across all agents
+
+```
+1. Before starting work
+   - Agent executes: /session-start "Task description (LIN-XXX)"
+   - Session ID generated automatically
+   - Agent name and working directory recorded
+
+2. During work
+   - Session automatically tracks:
+     * Files created/modified
+     * Tools used
+     * Activities with timestamps
+     * Linked Linear issues
+   - Agents can check status: /session-status
+   - Post updates to Council: /session-post
+
+3. During agent handoffs
+   - Outgoing agent updates session:
+     * /session-stop --notes "Handoff to [Agent]: [context]"
+     * Posts to #council-ops if --post flag used
+   - Incoming agent can:
+     * Review session history: /session-history
+     * View detailed handoff: /session-show <id>
+     * Start new linked session or resume existing
+
+4. After completing work
+   - Agent executes: /session-stop --notes "Summary" --post
+   - Session marked completed
+   - Automatic Slack notification sent
+   - Session archived to .claude/data/sessions/
+
+5. Coordination benefits
+   - Council visibility into active work
+   - Audit trail for compliance
+   - Reduced context loss between agents
+   - Clear handoff documentation
+   - Project management metrics
+```
+
+**Session Tracking Integration with Existing Protocols:**
+
+**Protocol 1 (Spec → Implementation) with Sessions:**
+```
+/session-start "Create spec for feature (LIN-123)"
+1. Claude creates spec
+2. Claude hands off: /session-stop --notes "Spec ready, handing to Codex"
+/session-start "Implement feature per spec (LIN-123)"
+3. Codex implements
+4. Codex returns: /session-stop --notes "Implementation complete, tests passing"
+/session-start "Document implementation (LIN-123)"
+5. Claude documents
+6. Claude completes: /session-stop --notes "Spec updated with implementation" --post
+```
+
+**Protocol 2 (Bug Fix) with Sessions:**
+```
+/session-start "Debug and fix bug (LIN-456)"
+1. Agent investigates and fixes
+2. Completes: /session-stop --notes "Bug fixed, root cause documented" --post
+```
+
+**Protocol 3 (Refactoring) with Sessions:**
+```
+/session-start "Refactoring analysis (LIN-789)"
+1. Gemini analyzes
+2. Handoff: /session-stop --notes "Analysis complete, migration plan ready"
+3. New session: /session-start "Execute refactoring (LIN-789)"
+4. Codex executes
+5. Complete: /session-stop --notes "Refactoring complete, tests passing" --post
+```
+
 ---
 
 ## Agent Selection Guide
@@ -330,6 +474,15 @@ cursor-agent "debug: API returns 500 on POST /users"
 - Trying multiple approaches
 - Learning codebase interactively
 
+**Use Session-Tracker when**:
+- Starting significant work that needs tracking
+- Managing multi-agent workflows
+- Creating audit trails for compliance
+- Posting progress updates to Slack
+- Coordinating handoffs between agents
+- Tracking file modifications and activities
+- Managing session lifecycle (start/stop/pause)
+
 ---
 
 ## Communication Standards
@@ -340,6 +493,8 @@ cursor-agent "debug: API returns 500 on POST /users"
 3. Follow project conventions in `/CLAUDE.md`
 4. Hand off cleanly to next agent
 5. Update status in Linear
+6. **Use session tracking for significant work** (`/session-start`, `/session-stop`)
+7. **Post session updates to Council** when completing major milestones
 
 ### Handoff Checklist:
 - [ ] Linear issue ID provided
@@ -347,6 +502,8 @@ cursor-agent "debug: API returns 500 on POST /users"
 - [ ] Success criteria defined
 - [ ] Output format specified
 - [ ] Next steps clear
+- [ ] **Session stopped with handoff notes** (`/session-stop --notes "Handoff to [Agent]: [context]"`)
+- [ ] **Session ID shared** for incoming agent to review history
 
 ### Status Updates:
 - Use Linear comments for progress
@@ -383,6 +540,12 @@ cursor-agent "debug: API returns 500 on POST /users"
 ## Version History
 
 - **v1.0** (2025-11-02): Initial registry structure
+- **v1.1** (2025-11-03): Added Session-Tracker agent for workflow management and audit trails
+- **v1.2** (2025-11-03):
+  - Added Protocol 4: Session Tracking for All Workflows
+  - Updated Communication Standards with session tracking requirements
+  - Enhanced Handoff Checklist with session coordination
+  - Integrated session tracking into all existing protocols
 - Updates: Add new agents/protocols as they're proven
 
 ---
