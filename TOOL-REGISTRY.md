@@ -2,7 +2,7 @@
 
 **Purpose:** Comprehensive catalog of all tools, APIs, scripts, and integrations available in the slack-hq project.
 
-**Last Updated:** 2025-11-03
+**Last Updated:** 2025-11-03 (Session Tracking Hooks proposal added)
 
 ---
 
@@ -1214,6 +1214,104 @@ With the configured bot token, I can:
 
 ---
 
+### 3. Session Tracking Hooks
+
+**Status:** 🟡 Proposed
+
+**Linear Issue:** [SLHQ-17](https://linear.app/abuah/issue/SLHQ-17)
+
+**GitHub Issue:** [#2](https://github.com/IkechukwuAbuah/slack-hq/issues/2)
+
+**Purpose:** Automatic session tracking via Claude Code hooks system - replaces manual slash commands with deterministic hook-based automation
+
+**Proposed By:** Kelvin Ikechukwu Abuah
+**Proposed Date:** 2025-11-03
+
+**Use Cases:**
+- Automatic session creation when Claude starts work (SessionStart hook)
+- Real-time activity tracking as tools are used (PreToolUse hook)
+- Automatic session completion with Slack posting (Stop hook)
+- Subagent handoff tracking (SubagentStop hook)
+- Zero manual intervention needed (no /session-start or /session-stop)
+
+**Capabilities:**
+- Auto-create session on SessionStart hook
+- Track activities via PreToolUse hook (Write/Edit/Bash/Read/Grep)
+- Auto-complete session on Stop hook with optional Slack posting
+- Log subagent handoffs via SubagentStop hook
+- Backward compatible with existing slash commands
+- Configurable auto-post, channel routing, filters
+- JSON Schema validation before persistence
+- Slack Block Kit integration for rich formatting
+
+**Architecture:**
+```
+~/.claude/hooks/
+├── session_tracker.py        # Main hook handler (receives JSON from stdin)
+├── session_manager.py        # Session CRUD operations
+├── slack_poster.py           # Slack Block Kit integration
+└── config.json              # Settings (auto-post, channels, filters)
+
+.claude/data/sessions/        # Existing storage (unchanged)
+└── *.json
+```
+
+**Hook Configuration:**
+```json
+{
+  "hooks": {
+    "SessionStart": [{"matcher": "", "hooks": [{"type": "command", "command": "uv run ~/.claude/hooks/session_tracker.py start"}]}],
+    "Stop": [{"matcher": "", "hooks": [{"type": "command", "command": "uv run ~/.claude/hooks/session_tracker.py stop --auto-post"}]}],
+    "PreToolUse": [
+      {"matcher": "Write|Edit|MultiEdit", "hooks": [{"type": "command", "command": "uv run ~/.claude/hooks/session_tracker.py activity --type code"}]},
+      {"matcher": "Bash", "hooks": [{"type": "command", "command": "uv run ~/.claude/hooks/session_tracker.py activity --type deployment"}]},
+      {"matcher": "Read|Grep|Glob", "hooks": [{"type": "command", "command": "uv run ~/.claude/hooks/session_tracker.py activity --type analysis"}]}
+    ],
+    "SubagentStop": [{"matcher": "", "hooks": [{"type": "command", "command": "uv run ~/.claude/hooks/session_tracker.py subagent"}]}]
+  }
+}
+```
+
+**Dependencies:**
+- Python 3.10+ with `uv` package manager
+- Existing `SLACK_BOT_TOKEN` in environment
+- `.claude/data/sessions/` directory (auto-created)
+- Existing session JSON schema
+
+**Risk Assessment:**
+- **Risk Level:** Low
+- **Data Classification:** Internal (session metadata)
+- **Security Concerns:** Hook runs on every tool use (must be fast <100ms), should fail gracefully
+- **Data Retention:** Same as existing sessions (gitignored, local only)
+- **Audit Trail:** All hooks log to ~/.claude/logs/hooks/
+
+**Estimated Effort:** 3-4 days
+- Day 1: Hook scripts (session_tracker.py, session_manager.py, slack_poster.py)
+- Day 2: Configuration, testing, validation
+- Day 3: Documentation updates (CLAUDE.md, AGENTS.md)
+- Day 4: Deployment, announcement, monitoring setup
+
+**Benefits Over Current Approach:**
+- ✅ Automatic tracking (no manual commands needed)
+- ✅ Comprehensive activity capture (real-time)
+- ✅ Transparent operation (works silently)
+- ✅ Deterministic execution (always runs, not LLM-dependent)
+- ✅ Backward compatible (manual controls remain)
+
+**When to Use:**
+- Enable for all Claude Code sessions (automatic)
+- Configure auto-post behavior per project
+- Adjust activity filters based on workflow needs
+
+**Documentation:**
+- Hook Docs: `/Users/x/Downloads/api-docs/anthropic/cc_hooks_docs.md`
+- Subagent Docs: `/Users/x/Downloads/api-docs/anthropic/anthropic_docs_subagents.md`
+- Existing Skill: `.claude/skills/session-tracking/`
+- Linear Issue: [SLHQ-17](https://linear.app/abuah/issue/SLHQ-17)
+- GitHub Issue: [#2](https://github.com/IkechukwuAbuah/slack-hq/issues/2)
+
+---
+
 ## Quick Reference
 
 ### Decision Tree: Which Tool to Use?
@@ -1223,7 +1321,8 @@ Need to...
 
 Deploy Council Bot?                    → scripts/slack-setup.sh
 Convert docs (MD ↔ DOCX)?             → scripts/convert.sh
-Track agent work sessions?             → scripts/session.sh
+Track agent work sessions manually?    → scripts/session.sh
+Track agent work sessions automatically? → Session Tracking Hooks (proposed)
 Propose new tool integration?          → scripts/create-tool-issue.sh
 
 Post to Slack?                         → Slack Web API (curl)
@@ -1677,7 +1776,18 @@ Make executable: `chmod +x scripts/verify-tool-registry.sh`
 
 ### Recent Updates
 
-**2025-11-03 (Latest):**
+**2025-11-03 (Session Tracking Hooks Proposal):**
+- 🟡 **Proposed Session Tracking Hooks** - Automatic session tracking via Claude Code hooks
+- ✅ **Created Linear issue SLHQ-17** - Full tool lifecycle tracking initiated
+- ✅ **Linked GitHub issue #2** - Session Tracking for Multi-Agent Coordination
+- ✅ **Added to Development Tools** section in TOOL-REGISTRY.md
+- ✅ **Updated Quick Reference** decision tree with automatic vs manual tracking
+- **Status:** Proposed (awaiting triage phase)
+- **Risk Level:** Low (reuses existing infrastructure)
+- **Estimated Effort:** 3-4 days implementation
+- **Benefits:** Automatic, comprehensive, transparent, deterministic, backward compatible
+
+**2025-11-03 (Tool Registry Manager):**
 - ✅ **Created tool-registry-manager subagent** (v1.0.0) at `~/.claude/agents/tools/tool-registry-manager.md`
 - ✅ **Comprehensive registry management capabilities:**
   - Registry validation (completeness, accuracy, format)

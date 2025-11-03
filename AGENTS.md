@@ -179,6 +179,66 @@ When transferring work to another agent:
 - Post milestone updates to keep Council informed
 - Complete sessions promptly to maintain accurate history
 
+### 🚨 MANDATORY: Session Broadcasting
+
+**REQUIREMENT: All agents MUST broadcast completed sessions to Slack.**
+
+Every session completion MUST include the `--post` flag to ensure Council visibility:
+
+```bash
+/session-stop --notes "Work summary" --post
+```
+
+**Channel Guidelines:**
+
+| Work Type | Channel | Channel ID |
+|-----------|---------|------------|
+| General updates | #announcements | C09Q8KCGM9C |
+| Engineering | #engineering | C09QAL92HFC |
+| Design/UX | #design-lab | C09QALF8WD8 |
+| Operations | #ops | C09Q761LJUD |
+| Documentation | #docs | C09Q76ULRHB |
+| Deployments | #automation | C09R4SCGR24 |
+
+**Broadcasting Requirements:**
+
+✅ **MUST broadcast:**
+- All completed sessions with deliverables
+- Milestone achievements
+- Multi-agent handoffs
+- Blocked work requiring input
+- Production deployments
+- Significant refactors or architectural changes
+
+❌ **Optional (no broadcast needed):**
+- Exploratory work (< 15 minutes)
+- Pure research with no outputs
+- Failed/abandoned attempts
+- Private drafts not ready for review
+
+**Examples:**
+
+```bash
+# Standard completion
+/session-stop --notes "Implemented user auth with full test coverage" --post
+
+# Engineering work to specific channel
+/session-stop --notes "Refactored API layer for better performance" --post --channel engineering
+
+# Handoff with context
+/session-stop --notes "Database schema ready. Frontend team can now implement UI" --post --channel announcements
+```
+
+**Enforcement:**
+
+Non-compliance with session broadcasting:
+- Reduces Council visibility into agent activities
+- Breaks audit trails
+- Complicates multi-agent coordination
+- May result in duplicate work
+
+All agents are expected to broadcast sessions consistently.
+
 ### Integration with Slack
 
 Sessions integrate with Council Bot for team visibility:
@@ -209,6 +269,16 @@ Invalid data will fail with clear error messages.
 - **Schema**: JSON Schema v7 validation
 
 **Reference**: Full documentation in `.claude/skills/session-tracking/SKILL.md`
+
+**🔄 Future Enhancement (Proposed - SLHQ-17):**
+
+A hooks-based automation system is proposed to replace manual session commands with automatic tracking:
+- **Auto-creation**: SessionStart hook creates sessions automatically
+- **Real-time tracking**: PreToolUse hook logs activities as they happen
+- **Auto-completion**: Stop hook completes and posts to Slack
+- **Zero intervention**: No manual /session-start or /session-stop needed
+- **Status**: [SLHQ-17](https://linear.app/abuah/issue/SLHQ-17) (Proposed)
+- **Details**: See [TOOL-REGISTRY.md](TOOL-REGISTRY.md#3-session-tracking-hooks)
 
 ## Claude Code Subagents
 

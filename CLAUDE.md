@@ -188,6 +188,16 @@ The session tracking system is implemented as:
 - **Data Storage**: `.claude/data/sessions/*.json` (gitignored)
 - **Schema Validation**: JSON Schema v7 validation before persistence
 
+**🔄 Future Enhancement (Proposed - SLHQ-17):**
+- **Hooks-Based Automation**: Automatic session tracking via Claude Code hooks system
+  - Auto-creates sessions on `SessionStart` hook
+  - Tracks activities in real-time via `PreToolUse` hook
+  - Auto-completes sessions on `Stop` hook with optional Slack posting
+  - Logs subagent handoffs via `SubagentStop` hook
+  - **Status:** Proposed ([SLHQ-17](https://linear.app/abuah/issue/SLHQ-17), [GitHub #2](https://github.com/IkechukwuAbuah/slack-hq/issues/2))
+  - **Benefits:** Automatic, comprehensive, transparent, deterministic
+  - See [TOOL-REGISTRY.md](TOOL-REGISTRY.md#3-session-tracking-hooks) for details
+
 #### Key Features
 
 - **Structured JSON storage** with UUID-based session IDs
@@ -212,6 +222,41 @@ The session tracking system is implemented as:
 # ... do work, Claude automatically tracks activities ...
 /session-stop --notes "Completed with full test coverage" --post
 ```
+
+#### 🚨 MANDATORY: Session Broadcasting
+
+**All completed sessions MUST be broadcasted to Slack for Council visibility.**
+
+When completing a session, the agent MUST use the `--post` flag to share the summary:
+
+```bash
+/session-stop --notes "Summary of work completed" --post
+```
+
+**Channel Selection:**
+- Default: `#announcements` (C09Q8KCGM9C) - For general Council updates
+- Engineering work: `#engineering` - For technical implementations
+- Design work: `#design-lab` - For UI/UX and design tasks
+- Deployments: `#ops` - For production changes
+- Documentation: `#docs` - For documentation updates
+
+**When to broadcast:**
+- ✅ All completed sessions with deliverables
+- ✅ Milestone achievements
+- ✅ Handoffs to other agents
+- ✅ Blocked work requiring Council input
+- ❌ Trivial/exploratory sessions (< 15 minutes)
+
+**Example:**
+```bash
+# Engineering work
+/session-stop --notes "Implemented JWT auth with tests" --post --channel engineering
+
+# Handoff
+/session-stop --notes "Auth complete, ready for frontend integration" --post
+```
+
+This ensures The Council maintains visibility into all agent activities and progress.
 
 ## Project-Specific Commands
 
