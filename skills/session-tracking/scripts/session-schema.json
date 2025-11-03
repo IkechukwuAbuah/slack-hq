@@ -1,0 +1,177 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://slack-hq.local/schemas/session.json",
+  "title": "Session",
+  "description": "AI Council session tracking data structure",
+  "type": "object",
+  "required": [
+    "session_id",
+    "agent_name",
+    "started_at",
+    "project",
+    "working_directory",
+    "status"
+  ],
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique session identifier (UUIDv4)"
+    },
+    "agent_name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "description": "Name or identifier of the AI agent"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Session start timestamp (ISO8601 UTC)"
+    },
+    "ended_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Session end timestamp (ISO8601 UTC)"
+    },
+    "project": {
+      "type": "string",
+      "const": "slack-hq",
+      "description": "Project identifier"
+    },
+    "working_directory": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Absolute path to working directory"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "paused", "completed"],
+      "description": "Current session status"
+    },
+    "auto_post": {
+      "type": "boolean",
+      "default": false,
+      "description": "Enable automatic Slack posting on lifecycle events"
+    },
+    "slack_channel": {
+      "type": ["string", "null"],
+      "pattern": "^#[a-z0-9-]+$",
+      "description": "Slack channel for updates"
+    },
+    "slack_message_ts": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9]+\\.[0-9]+$",
+      "description": "Slack message timestamp for updates"
+    },
+    "slack_thread_ts": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9]+\\.[0-9]+$",
+      "description": "Slack thread timestamp for replies"
+    },
+    "activities": {
+      "type": "array",
+      "description": "Chronological log of session activities",
+      "items": {
+        "type": "object",
+        "required": ["timestamp", "type", "summary"],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Activity timestamp (ISO8601 UTC)"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["code", "analysis", "meeting", "deployment"],
+            "description": "Activity category"
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "Brief activity description"
+          },
+          "details": {
+            "type": "string",
+            "maxLength": 2000,
+            "description": "Extended activity details"
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Files involved in activity"
+          },
+          "tools": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Tools used in activity"
+          },
+          "linked_issue": {
+            "type": "string",
+            "pattern": "^SLHQ-[0-9]+$",
+            "description": "Related Linear issue ID"
+          }
+        }
+      }
+    },
+    "prompts": {
+      "type": "array",
+      "description": "Raw prompt text inputs",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tools_used": {
+      "type": "array",
+      "description": "Unique list of tools invoked",
+      "items": {
+        "type": "string"
+      }
+    },
+    "files_modified": {
+      "type": "array",
+      "description": "Files changed during session",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tags": {
+      "type": "array",
+      "description": "Categorization tags",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]+$"
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Freeform summary and handoff guidance"
+    },
+    "handoff_status": {
+      "type": "object",
+      "required": ["state"],
+      "description": "Multi-agent handoff coordination",
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": ["none", "requested", "transferred"],
+          "description": "Handoff state"
+        },
+        "assignee": {
+          "type": ["string", "null"],
+          "description": "Target agent for handoff"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Handoff context"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
