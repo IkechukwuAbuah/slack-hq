@@ -1,5 +1,7 @@
 # Claude Agent Instructions
 
+> **Update (2025-11-05):** Replace `slack api …` examples with Slack MCP or curl calls. The snippets remain to show payload shapes for Council Bot interactions.
+
 **Role**: Documentation Lead & Agent Orchestrator
 **Version**: 1.1
 **Last Updated**: 2025-11-03
@@ -50,32 +52,44 @@ test -n "$SLACK_BOT_TOKEN" && echo "Ready" || echo "Token missing"
 
 #### Common Operations
 
-**Post a message:**
-```bash
-slack api chat.postMessage \
-  --data '{"channel":"#general","text":"Documentation updated: /docs/specs/LIN-123.md"}' \
-  --token "$SLACK_BOT_TOKEN"
+**Post a message (preferred – Slack MCP):**
+```javascript
+mcp__slack__slack_post_message({
+  channel_id: "C09QAKDHKMG",
+  text: "Documentation updated: /docs/specs/LIN-123.md"
+});
 ```
 
-**Create a channel:**
+Fallback:
 ```bash
-slack api conversations.create \
-  --data '{"name":"project-alpha"}' \
-  --token "$SLACK_BOT_TOKEN"
+curl -s -X POST https://slack.com/api/chat.postMessage \
+  -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{"channel":"#general","text":"Documentation updated: /docs/specs/LIN-123.md"}'
 ```
 
-**List channels:**
+**Create a channel (curl):**
 ```bash
-slack api conversations.list \
-  --data '{"types":"public_channel,private_channel"}' \
-  --token "$SLACK_BOT_TOKEN"
+curl -s -X POST https://slack.com/api/conversations.create \
+  -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{"name":"project-alpha"}'
 ```
 
-**Read channel history:**
+**List channels (curl):**
 ```bash
-slack api conversations.history \
-  --data '{"channel":"C123ABC","limit":50}' \
-  --token "$SLACK_BOT_TOKEN"
+curl -s -X POST https://slack.com/api/conversations.list \
+  -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{"types":"public_channel,private_channel"}'
+```
+
+**Read channel history (curl):**
+```bash
+curl -s -X POST https://slack.com/api/conversations.history \
+  -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{"channel":"C123ABC","limit":50}'
 ```
 
 #### Integration with Documentation Workflow
@@ -83,27 +97,51 @@ slack api conversations.history \
 When you create or update documentation:
 
 1. **After creating a spec:**
+   ```javascript
+   mcp__slack__slack_post_message({
+     channel_id: "C09Q76ULRHB", // #docs
+     text: "📄 New spec ready: LIN-123 Email Notifications\n/docs/specs/LIN-123-email-notifications.md"
+   });
+   ```
+
+   Fallback:
    ```bash
-   # Notify team in Slack
-   slack api chat.postMessage \
-     --data '{"channel":"#docs","text":"📄 New spec ready: LIN-123 Email Notifications\n/docs/specs/LIN-123-email-notifications.md"}' \
-     --token "$SLACK_BOT_TOKEN"
+   curl -s -X POST https://slack.com/api/chat.postMessage \
+     -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+     -H "Content-Type: application/json" \
+     --data '{"channel":"#docs","text":"📄 New spec ready: LIN-123 Email Notifications\n/docs/specs/LIN-123-email-notifications.md"}'
    ```
 
 2. **After handoff to another agent:**
+   ```javascript
+   mcp__slack__slack_post_message({
+     channel_id: "C09QAKDHKMG",
+     text: "🤝 Handed off LIN-123 to Codex for implementation\nSpec: /docs/specs/LIN-123-user-auth.md"
+   });
+   ```
+
+   Fallback:
    ```bash
-   # Post handoff notice
-   slack api chat.postMessage \
-     --data '{"channel":"#agent-coordination","text":"🤝 Handed off LIN-123 to Codex for implementation\nSpec: /docs/specs/LIN-123-user-auth.md"}' \
-     --token "$SLACK_BOT_TOKEN"
+   curl -s -X POST https://slack.com/api/chat.postMessage \
+     -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+     -H "Content-Type: application/json" \
+     --data '{"channel":"#agent-coordination","text":"🤝 Handed off LIN-123 to Codex for implementation\nSpec: /docs/specs/LIN-123-user-auth.md"}'
    ```
 
 3. **After receiving agent results:**
+   ```javascript
+   mcp__slack__slack_post_message({
+     channel_id: "C09QAKDHKMG",
+     text: "✅ LIN-123 implemented by Codex\nTests passing | Documentation updated"
+   });
+   ```
+
+   Fallback:
    ```bash
-   # Announce completion
-   slack api chat.postMessage \
-     --data '{"channel":"#project-updates","text":"✅ LIN-123 implemented by Codex\nTests passing | Documentation updated"}' \
-     --token "$SLACK_BOT_TOKEN"
+   curl -s -X POST https://slack.com/api/chat.postMessage \
+     -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+     -H "Content-Type: application/json" \
+     --data '{"channel":"#project-updates","text":"✅ LIN-123 implemented by Codex\nTests passing | Documentation updated"}'
    ```
 
 #### Error Handling
@@ -111,7 +149,7 @@ When you create or update documentation:
 **If Slack CLI fails:**
 1. Check token: `echo $SLACK_BOT_TOKEN`
 2. Verify auth: `slack auth list`
-3. Test connection: `slack api auth.test --token "$SLACK_BOT_TOKEN"`
+3. Test connection: `curl -s -X POST https://slack.com/api/auth.test -H "Authorization: Bearer $SLACK_BOT_TOKEN"`
 4. Fall back to documentation only (don't block on Slack)
 5. Notify user of Slack integration issue
 

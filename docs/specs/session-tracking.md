@@ -13,6 +13,8 @@ related:
 # Session Tracking Platform
 
 ## Section 1: Feature Overview
+> **Update (2025-11-05):** The production implementation uses the `session-tracker-2` subagent with direct Slack MCP access. CLI references remain for historical context; defer to `.claude/agents/session-tracker-2.md` for operational details.
+
 Session tracking provides a unified audit trail for all AI Council agents collaborating inside slack-hq. It captures when a session begins, what activities occur, which files change, and how progress is surfaced to the Council via Slack.
 
 **Problem Statement**: Agents lack a shared view of ongoing work, making handoffs brittle and losing institutional memory between sessions.
@@ -42,7 +44,7 @@ Session tracking provides a unified audit trail for all AI Council agents collab
   "working_directory": "path",
   "status": "active | paused | completed",
   "auto_post": false,
-  "slack_channel": "#council-ops",
+  "slack_channel": "#council-core",
   "slack_message_ts": null,
   "slack_thread_ts": null,
   "activities": [
@@ -113,7 +115,18 @@ tests/
 - `/session show <id>`: Outputs detailed JSON summary (pretty-printed) and highlights key activities.
 - `/session post [--id <id>] [--thread|-t]`: Posts update to Slack using stored metadata; default uses current active session.
 
-### 2.4 Script Implementation (`scripts/session.sh`)
+### 2.4 Legacy Script Implementation (`scripts/session.sh`)
+
+> This legacy Bash implementation has been superseded by the `session-tracker-2` subagent. Keep it for historical reference and migration notes only.
+
+### 2.5 Current MCP Implementation (session-tracker-2)
+
+- Session lifecycle, activity logging, and Slack posting are handled by `.claude/agents/session-tracker-2.md`
+- All `/session-*` commands delegate to session-tracker-2 via the Task tool
+- Slack MCP tools (`mcp__slack__slack_post_message`, `mcp__slack__slack_reply_to_thread`) replace shell-based curl calls
+- Session data persists under `.claude/data/sessions/` with JSON Schema validation
+- Handoff tracking and auto-post options are controlled through session metadata instead of shell flags
+
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
@@ -208,7 +221,7 @@ esac
 ```
 
 ### 3.3 Posting Rules
-- Manual `/session post` posts to `slack_channel` stored in metadata (default `#council-ops`).
+- Manual `/session post` posts to `slack_channel` stored in metadata (default `#council-core`).
 - When `auto_post=true`, hooks trigger `session.sh post --id <id> --auto` during start/stop.
 - Channel overrides allowed via `/session start --channel #feature-labs`.
 - Updates to existing posts use message `ts` stored in metadata; subsequent updates append to the same thread.
@@ -234,7 +247,7 @@ esac
 
 ### 4.2 Testing Procedures
 - **Unit tests** (`tests/session/session-schema.spec.ts`): Validate JSON serialization/deserialization, ensure required fields present, confirm state transitions.
-- **Integration tests**: Mock Slack CLI via `slack api chat.postMessage --dry-run` (use stub script). Validate that auto-post flag triggers commands.
+- **Integration tests**: Stub `mcp__slack__slack_post_message` (or curl fallback) to validate auto-post flows without hitting Slack.
 - **Manual QA checklist**:
   - `./scripts/session.sh start "Codex Spike"`
   - `./scripts/session.sh status`
@@ -268,7 +281,7 @@ esac
 
 ### 5.1 Example Workflow
 ```bash
-./scripts/session.sh start "Initialize Session Tracking" --auto-post --channel #council-ops
+./scripts/session.sh start "Initialize Session Tracking" --auto-post --channel #council-core
 ./scripts/session.sh status
 ./scripts/session.sh history --limit 5
 ./scripts/session.sh post --summary "Drafted spec and research" --id $(./scripts/session.sh current)

@@ -79,7 +79,7 @@ After setup completion, verify:
 
 **Status:** ⏳ Awaiting manual setup
 **Workspace:** The Council (T068KC5GURY)
-**Channel:** #council-core (ID: TBD after channel creation)
+**Channel:** #council-core (ID: C09QAKDHKMG)
 **Team:** SLHQ
 
 ### Notification Channel Strategy

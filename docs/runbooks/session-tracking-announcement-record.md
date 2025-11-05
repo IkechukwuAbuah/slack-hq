@@ -40,8 +40,8 @@ Successfully completed a three-phase research, design, and communication workflo
 
 ### ✅ Phase 3: Council Communication
 - **GitHub Issue**: [#2 Session Tracking](https://github.com/IkechukwuAbuah/slack-hq/issues/2)
-- **Slack Message**: Posted successfully
-  - Channel: C0684S1LTLP
+- **Slack Message**: Posted successfully *(historical record)*
+  - Channel: C0684S1LTLP *(legacy #2nd-brain; current broadcasts use #announcements / #council-ops)*
   - Timestamp: 1762130277.053359
   - Bot: Claude MCP
   - Format: Block Kit with interactive buttons
@@ -54,7 +54,7 @@ Successfully completed a three-phase research, design, and communication workflo
 
 ## Slack Post Details
 
-**Posted To**: Channel C0684S1LTLP (The Council workspace)
+**Posted To**: Channel C0684S1LTLP (The Council workspace — historical archive)
 **Post Timestamp**: 1762130277.053359
 **Response**: `{"ok":true}`
 

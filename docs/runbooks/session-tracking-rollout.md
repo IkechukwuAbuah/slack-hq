@@ -90,22 +90,24 @@ config/
 
 ---
 
+> **Update (2025-11-05):** Session rollout now uses the `session-tracker-2` subagent with Slack MCP. The steps below describe the original shell-script plan and are retained for historical reference.
+
 ## Implementation Roadmap
 
 ### Phase 1: Session Persistence (2-3 days)
 **Owner**: TBD
 **Tasks**:
 - [ ] Create `.claude/data/sessions/` directory structure
-- [ ] Implement session start/stop hooks
+- [ ] (legacy) Implement session start/stop hooks
 - [ ] Add schema validation with JSON Schema
 - [ ] Update `.gitignore` for session data
-- [ ] Test smoke tests: `./scripts/session.sh record-start`
+- [ ] (legacy) Test smoke tests: `./scripts/session.sh record-start`
 
 ### Phase 2: Slash Command Interface (3-4 days)
 **Owner**: TBD
 **Tasks**:
 - [ ] Populate `.claude/commands/session/*.md` templates
-- [ ] Implement `scripts/session.sh` with subcommands
+- [ ] (legacy) Implement `scripts/session.sh` with subcommands
 - [ ] Add CLI parsing for all operations
 - [ ] Create helper scripts for status/history/show
 - [ ] Test command execution flow
@@ -113,10 +115,10 @@ config/
 ### Phase 3: Slack Integration (2-3 days)
 **Owner**: TBD
 **Tasks**:
-- [ ] Implement `./scripts/session.sh post`
+- [ ] (legacy) Implement `./scripts/session.sh post`
 - [ ] Create Slack message templates
 - [ ] Add auto-post hook integration
-- [ ] Test manual and automatic posting
+- [ ] (legacy) Test manual and automatic posting
 - [ ] Validate Block Kit formatting
 
 ### Phase 4: Status Line Integration (2 days)
@@ -168,9 +170,10 @@ config/
    cat docs/guides/posting-session-tracking-announcement.md
 
    # Execute posting command
-   slack api chat.postMessage \
-     --data @scripts/slack/session-tracking-announcement.json \
-     --token "$SLACK_BOT_TOKEN"
+   curl -s -X POST https://slack.com/api/chat.postMessage \
+     -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+     -H "Content-Type: application/json" \
+     --data @scripts/slack/session-tracking-announcement.json
    ```
 
 3. **Monitor Feedback**:

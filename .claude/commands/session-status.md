@@ -9,14 +9,15 @@ Display the current active session or the most recent session status.
 
 ## Task
 
-1. **Load the session-tracking skill** - Use for implementation details
+**This command uses the session-tracker-2 subagent.**
 
-2. **Execute status script**:
-   ```bash
-   ~/.claude/skills/session-tracking/scripts/session.sh status
+1. **Launch session-tracker-2 subagent**:
+   ```
+   Use Task tool with subagent_type="session-tracker-2"
+   Operation: status
    ```
 
-3. **Find relevant session**:
+2. **Subagent finds relevant session**:
    - Look for active sessions first
    - If no active session, show most recent session
    - Search in `.claude/data/sessions/` directory

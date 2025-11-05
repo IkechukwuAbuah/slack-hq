@@ -463,6 +463,89 @@ Review PR #42:
 - Approve or request changes
 ```
 
+## Available Operational Templates
+
+### Reference Audit & Cleanup Template
+**File:** `reference-audit-cleanup.md`
+**Created:** 2025-11-04
+**Type:** Reusable Template
+**Estimated Time:** 1-3 hours (depending on scope)
+
+**Purpose:**
+Comprehensive template for auditing and updating any type of reference across a codebase (API endpoints, channel IDs, service URLs, config keys, etc.). Includes discovery, validation, surgical updates, artifact archival, and clean reference document creation.
+
+**Key Components:**
+- Pattern-based discovery and search
+- File categorization (active vs. historical)
+- Surgical update strategies
+- Historical record preservation
+- Artifact management and archival
+- Single source of truth creation
+
+**Use when:**
+- Migrating API endpoints or service URLs
+- Updating channel IDs or integration references
+- Rotating authentication tokens or keys
+- Cleaning up deprecated configuration
+- Consolidating scattered reference documentation
+- After major infrastructure changes
+
+**Customization:**
+Replace bracketed placeholders (`[REFERENCE_TYPE]`, `[PATTERN]`, etc.) with your specific context. Template is language and framework agnostic.
+
+---
+
+## Available Linear Issue Execution Prompts
+
+### SLHQ-2: Complete Repository Structure & Templates
+**File:** `SLHQ-2-complete-repo-structure.md`
+**Created:** 2025-11-03
+**Status:** Ready for execution
+**Estimated Time:** 60 minutes
+
+**Purpose:**
+Comprehensive prompt for finalizing slack-hq repository structure, creating missing directories (`/artifacts`, `/agents/prompts`, `/agents/registry`), writing documentation, and updating README with complete directory tree.
+
+**Key Components:**
+- Directory creation with .gitignore strategy
+- README files for all new directories
+- Root README.md enhancement
+- Template validation
+- Phased execution plan
+
+**Use when:**
+- Setting up new project structures
+- Organizing documentation systems
+- Establishing artifact management
+- Creating reusable templates
+
+### SLHQ-4: Enable Linear Integrations (GitHub + Slack)
+**File:** `SLHQ-4-enable-linear-integrations.md`
+**Created:** 2025-11-03
+**Status:** Ready for execution
+**Estimated Time:** 95 minutes
+
+**Purpose:**
+Complete guide for enabling and configuring Linear's GitHub and Slack integrations, including automated status updates, PR linking, and notification management.
+
+**Key Components:**
+- GitHub integration setup (PR → status automation)
+- Slack integration setup (notification configuration)
+- Channel strategy decision framework
+- Comprehensive testing procedures
+- Configuration backup documentation
+
+**Use when:**
+- Setting up Linear in new workspaces
+- Configuring integrations for repositories
+- Establishing automation workflows
+- Creating team notification systems
+
+**Manual Steps Required:**
+- Linear settings UI access
+- Slack channel creation (if needed)
+- OAuth authorization flows
+
 ## Related Documentation
 
 - [agents/agents.md](../agents.md) - Agent coordination guide
@@ -473,3 +556,5 @@ Review PR #42:
 ---
 
 **Remember:** Great prompts capture best practices and make them reusable. Create prompts for any workflow you repeat more than twice.
+
+**Last Updated:** 2025-11-03

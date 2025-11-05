@@ -33,7 +33,7 @@ Create a new session with metadata and optional Slack auto-posting.
 ### Options
 
 - `--auto-post` - Enable automatic Slack posting on lifecycle events
-- `--channel <channel>` - Slack channel for updates (default: #council-ops)
+- `--channel <channel>` - Slack channel for updates (default: #council-core)
 
 ### Behavior
 
@@ -382,7 +382,7 @@ SESSION_ID=$(./scripts/session.sh start "My Task" | jq -r .session_id)
 
 ```bash
 # Auto-post enabled
-./scripts/session.sh start "Deploy" --auto-post --channel #deployments
+./scripts/session.sh start "Deploy" --auto-post --channel #automation
 
 # Manual updates
 ./scripts/session.sh post --id <session-id>

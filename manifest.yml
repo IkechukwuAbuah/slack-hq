@@ -1,0 +1,33 @@
+display_information:
+  name: Council Bot
+  description: AI agent connector for The Council workspace operations
+features:
+  bot_user:
+    display_name: Council Bot
+    always_online: true
+oauth_config:
+  redirect_urls:
+    - https://localhost:3000/slack/oauth/callback
+  scopes:
+    bot:
+      - channels:join
+      - channels:manage
+      - channels:read
+      - channels:write.invites
+      - channels:write.topic
+      - chat:write
+      - chat:write.public
+      - groups:read
+      - groups:write
+      - groups:write.invites
+      - groups:write.topic
+      - im:history
+      - usergroups:write
+    user:
+      - channels:history
+      - channels:read
+      - channels:write
+      - chat:write
+settings:
+  event_subscriptions:
+    request_url: https://localhost:3000/slack/events

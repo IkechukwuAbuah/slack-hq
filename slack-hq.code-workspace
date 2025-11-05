@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../claude-skills"
+		},
+		{
+			"path": "../api-docs"
+		},
+		{
+			"path": "../../.claude"
+		}
+	],
+	"settings": {}
+}

@@ -27,7 +27,7 @@ Inform all agents that:
 
 **Announcement Type:** Implementation complete, ready for production use
 
-**Target Channel:** `#2nd-brain` (C0684S1LTLP) or `#council-ops`
+**Target Channel:** `#announcements` (C09Q8KCGM9C) or `#council-ops` (C09Q761LJUD)
 
 ## Message Structure
 
@@ -93,11 +93,11 @@ Inform all agents that:
    - <1% validation failures
 
 9. **Next Steps for Developers**
-   - Implement scripts/session.sh
-   - Create JSON schema
-   - Set up directories
-   - Test workflow
-   - Post first session
+   - Validate session-tracker-2 auto-post flows
+   - Backfill documentation with MCP-based examples
+   - Monitor Council channels for feedback
+   - Capture adoption metrics in session analytics
+   - Schedule follow-up retro with Council Bot maintainers
 
 10. **Context Links** (5 links)
     - Spec, Research, Agents, Registry, Issue
@@ -119,14 +119,29 @@ test -n "$SLACK_BOT_TOKEN" && echo "Token configured" || echo "Token missing"
 test -f scripts/slack/session-tracking-implementation-complete.json && echo "File exists" || echo "File missing"
 
 # 3. Check channel ID is correct
-# C0684S1LTLP = #2nd-brain
-# Update in JSON if posting elsewhere
+# C09Q8KCGM9C = #announcements
+# Update in JSON if broadcasting to #council-ops instead
 ```
 
-### Post Command
+### Preferred: Post with Slack MCP
+
+```javascript
+import fs from 'node:fs';
+
+const payload = JSON.parse(fs.readFileSync('scripts/slack/session-tracking-implementation-complete.json', 'utf8'));
+
+mcp__slack__slack_post_message({
+  channel_id: 'C09Q8KCGM9C',
+  text: payload.text,
+  blocks: payload.blocks
+});
+```
+
+### Fallback: Direct Web API
+
+Slack CLI v3.9.0 does **not** support `slack api …`. Use curl if MCP is unavailable.
 
 ```bash
-# From repository root
 curl -s -X POST https://slack.com/api/chat.postMessage \
   -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
   -H "Content-Type: application/json; charset=utf-8" \
@@ -138,13 +153,12 @@ curl -s -X POST https://slack.com/api/chat.postMessage \
 ```json
 {
   "ok": true,
-  "channel": "C0684S1LTLP",
+  "channel": "C09Q8KCGM9C",
   "ts": "1234567890.123456",
   "message": {
     "type": "message",
     "subtype": "bot_message",
-    "text": "🎉 Session Tracking Implementation Complete - Ready for Use",
-    ...
+    "text": "🎉 Session Tracking Implementation Complete - Ready for Use"
   }
 }
 ```

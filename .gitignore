@@ -81,4 +81,8 @@ temp-context/secrets.md
 
 # Claude Code runtime data
 .claude/mcp.json
+.claude/settings.local.json
 .claude/data/
+
+# Archived audit reports
+.archive/

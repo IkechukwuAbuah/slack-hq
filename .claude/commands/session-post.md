@@ -1,78 +1,51 @@
 ---
-description: Post session summary to Slack with Block Kit formatting
+description: Post session summary to Slack with Block Kit formatting using session-tracker-2 subagent
 tags: [session, tracking, slack, project]
 ---
 
 # Post Session to Slack
 
-Post a formatted session summary to the Council Bot Slack channel, creating engagement through rich formatting and threading.
+Post a formatted session summary to the Council Bot Slack channel. Uses **session-tracker-2 subagent** which handles EVERYTHING including Slack posting.
 
 ## Task
 
-1. **Load the session-tracking skill** - Use for Slack integration details
+**Architecture: Subagent loads session, builds Block Kit, posts to Slack, updates session JSON**
 
-2. **Verify prerequisites**:
-   - Check SLACK_BOT_TOKEN environment variable is set
-   - Verify session exists
-   - Confirm Slack CLI is available
-
-3. **Load session data**:
-   - If session ID provided: use that session
-   - If no ID: use current active session
-   - Read from `.claude/data/sessions/<session-id>.json`
-
-4. **Format message with Block Kit**:
-
-   **Header Section:**
-   - Session title with status emoji
-   - Agent name and task name
-   - Duration and timestamp
-
-   **Activities Section:**
-   - List key activities (max 5)
-   - Show file changes count
-   - Display tools used
-
-   **Links Section:**
-   - Link to Linear issue (if applicable)
-   - Link to relevant docs/specs
-   - Link to PR (if available)
-
-   **Metadata:**
-   - Tags as hashtags
-   - Handoff information (if applicable)
-
-5. **Post to Slack**:
-   ```bash
-   slack api chat.postMessage --data '{
-     "channel": "#council-ops",
-     "text": "Session Summary: Task Name",
-     "blocks": [...],
-     "thread_ts": "...",
-     "unfurl_links": false
-   }' --token "$SLACK_BOT_TOKEN"
+1. **Launch session-tracker-2 subagent**:
+   ```
+   Use Task tool with subagent_type="session-tracker-2"
+   Operation: post_session
+   Session ID: [provided or "active"]
+   Channel: [if --channel provided, default: C09QAKDHKMG]
+   Thread: [if --thread provided with thread_ts]
+   Dry Run: [if --dry-run flag provided]
    ```
 
-6. **Handle threading**:
-   - If session has existing slack_message_ts: post as reply in thread
-   - If new session: create new message and store message_ts
-   - Update session JSON with message_ts and channel
+2. **Subagent handles EVERYTHING**:
+   - Load session from `.claude/data/sessions/{uuid}.json`
+   - Calculate duration (hours, minutes)
+   - Format timestamp
+   - Build Block Kit message with:
+     - Header with status emoji (✅/🔵/⏸️/❌)
+     - Section with agent, duration, date
+     - Divider
+     - Activities section (formatted list)
+     - Handoff section (if applicable)
+     - Context footer with tags and Linear links
+   - **DIRECTLY post to Slack** using `mcp__slack__slack_post_message`
+   - Store `slack_message_ts` and `slack_thread_ts` in session JSON
+   - Return confirmation with Slack message URL
 
-7. **Error handling**:
-   - Retry on rate limit (max 3 times with exponential backoff)
-   - Log errors to `logs/slack-post-errors.log`
-   - Validate payload size before posting (< 40KB)
-   - Gracefully handle missing SLACK_BOT_TOKEN
-
-8. **Report to user**:
-   - Confirmation message
+3. **Expected output**:
+   - Confirmation of successful post
    - Slack message URL
-   - Thread status
+   - Thread timestamp
+   - Updated session file path
 
 ## Parameters
 
 - Session ID (optional): Specific session to post (defaults to current active)
-- `--channel`: Slack channel to post to (default: #council-ops)
+- `--channel`: Slack channel to post to (default: #council-core)
 - `--thread`: Reply to existing thread (requires thread_ts)
 - `--dry-run`: Preview message without posting
 - `--minimal`: Use compact formatting
@@ -82,7 +55,7 @@ Post a formatted session summary to the Council Bot Slack channel, creating enga
 ```bash
 /session-post
 /session-post --dry-run
-/session-post a1b2c3d4 --channel #deployments
+/session-post a1b2c3d4 --channel #automation
 /session-post --minimal
 ```
 

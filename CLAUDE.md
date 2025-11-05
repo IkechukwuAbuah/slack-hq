@@ -105,7 +105,7 @@ mcp__slack__slack_get_user_profile     # Get user details
 ```javascript
 // Post a message
 mcp__slack__slack_post_message({
-  channel_id: "C068K8VDXGB",
+  channel_id: "C09Q8KCGM9C",
   text: "Hello from Claude!"
 })
 
@@ -114,7 +114,7 @@ mcp__slack__slack_list_channels({ limit: 50 })
 
 // Reply to a thread
 mcp__slack__slack_reply_to_thread({
-  channel_id: "C068K8VDXGB",
+  channel_id: "C09Q8KCGM9C",
   thread_ts: "1234567890.123456",
   text: "Thread reply"
 })
@@ -179,7 +179,7 @@ source .env
 curl -X POST https://slack.com/api/chat.postMessage \
   -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"channel":"C068K8VDXGB","text":"Hello"}'
+  -d '{"channel":"C09Q8KCGM9C","text":"Hello"}'
 
 # List channels
 curl -X GET "https://slack.com/api/conversations.list?types=public_channel" \
@@ -231,10 +231,10 @@ All session tracking is managed through slash commands:
   ```bash
   /session-post
   /session-post --dry-run
-  /session-post --channel #deployments
+  /session-post --channel #automation
   ```
 
-**⚠️ Important:** All `/session` commands use the **session-tracker-2 subagent** (`.claude/agents/session-tracker-2.md`). The old `session-tracking` skill (`.claude/skills/session-tracking/`) is **DEPRECATED** - it uses shell scripts with broken Slack integration. Do NOT use the skill or call shell scripts directly.
+**⚠️ Important:** All `/session` commands use the **session-tracker-2 subagent** (`.claude/agents/session-tracker-2.md`). The old **session-tracker agent (v1)** and `session-tracking` skill (`.claude/skills/session-tracking/`) are **DEPRECATED** - they use shell scripts with broken Slack integration. Do NOT use the old agent, skill, or call shell scripts directly.
 
 #### Session Tracking Implementation
 
@@ -364,11 +364,11 @@ When completing a session, the agent MUST use the `--post` flag to share the sum
 ```
 
 **Channel Selection:**
-- Default: `#announcements` (C09Q8KCGM9C) - For general Council updates
-- Engineering work: `#engineering` - For technical implementations
-- Design work: `#design-lab` - For UI/UX and design tasks
-- Deployments: `#ops` - For production changes
-- Documentation: `#docs` - For documentation updates
+- Default: `#council-core` (C09QAKDHKMG) - For session tracking and automation updates
+- Engineering work: `#engineering` (C09QAL92HFC) - For technical implementations
+- Design work: `#design-lab` (C09QALF8WD8) - For UI/UX and design tasks
+- Operations/Deployments: `#automation` (C09R4SCGR24) - For deployment and CI-CD
+- Documentation: `#docs` (C09Q76ULRHB) - For documentation updates
 
 **When to broadcast:**
 - ✅ All completed sessions with deliverables

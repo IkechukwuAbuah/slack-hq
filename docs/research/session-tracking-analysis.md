@@ -1,6 +1,8 @@
 # Session Tracking Implementation Research
 
 ## 1. Executive Summary
+> **Update (2025-11-05):** Production now relies on the `session-tracker-2` subagent with Slack MCP posting. Sections describing shell scripts remain for archival context.
+
 Session tracking will provide the slack-hq initiative with chronological, queryable records of agent activity so multi-agent work stays auditable and handoffs remain smooth. Drawing from the mature session manager in the claude md project, we will transpose persistent session metadata, lifecycle hooks, and Slack-facing touchpoints into slack-hq’s lightweight scaffold. The resulting capability enables agents to see who is working on what, when progress changed, and how to resume or review prior work without losing context.
 
 ## 2. Current State Analysis (slack-hq)
@@ -71,6 +73,8 @@ scripts/
 ```
 
 ## 7. Implementation Roadmap
+*Legacy reference: the roadmap below reflects the original shell-based design. Use `.claude/agents/session-tracker-2.md` for current implementation details.*
+
 - **Phase 1 – Session Persistence (2–3 days)**
   - Implement hooks to capture session start/stop events, write JSON using the schema defined in the design spec.
   - Add environment validation and `.gitignore` updates.
@@ -80,7 +84,7 @@ scripts/
   - Implement CLI parsing in `scripts/session.sh` (Node or Bash) to read/write session files and present summaries.
   - Unit-test serialization helpers via `npm test -- session` once test harness exists.
 - **Phase 3 – Slack Integration (2–3 days)**
-  - Add `./scripts/session.sh post` invoking `slack api chat.postMessage` with JSON templates.
+  - (Legacy) Add `./scripts/session.sh post` invoking a curl `chat.postMessage` call with JSON templates.
   - Support automatic posting when `auto_post` metadata is true; include channel selection and threading options.
   - Validate with manual command: `SLACK_BOT_TOKEN=... ./scripts/session.sh post --session <id>`.
 - **Phase 4 – Status Line & Realtime Tracking (2 days)**
@@ -90,7 +94,7 @@ scripts/
 
 ## 8. Risk Assessment
 - **Data drift**: Without validation, session JSON could become inconsistent across agents. Mitigation: centralize schema validation helper and run on every write.
-- **Slack noise**: Over-posting could overwhelm #council-ops. Mitigation: default manual posting; expose per-session `auto_post` flag with channel overrides.
+- **Slack noise**: Over-posting could overwhelm #council-core. Mitigation: default manual posting; expose per-session `auto_post` flag with channel overrides.
 - **Concurrent edits**: Multiple agents writing the same session file may cause race conditions. Mitigation: include session ownership metadata and optimistic locking (timestamp check) in Phase 2.
 - **Security**: Tokens stored in `.env`; ensure scripts fail gracefully if `SLACK_BOT_TOKEN` missing or scope insufficient.
 - **Adoption**: Agents may forget to start/stop sessions. Mitigation: integrate reminders in hooks/status line and document workflow in CLAUDE.md.
@@ -105,15 +109,17 @@ scripts/
 ## 10. Slack Integration Patterns
 - **Posting updates**:
   ```bash
-  slack api chat.postMessage \
-    --data '{"channel":"#council-ops","text":"📊 Session Update","blocks":[]}' \
-    --token "$SLACK_BOT_TOKEN"
+  curl -s -X POST https://slack.com/api/chat.postMessage \
+    -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+    -H "Content-Type: application/json" \
+    --data '{"channel":"#council-ops","text":"📊 Session Update","blocks":[]}'
   ```
 - **Fetching channel history for context merging**:
   ```bash
-  slack api conversations.history \
-    --data '{"channel":"#council-ops","limit":20}' \
-    --token "$SLACK_BOT_TOKEN"
+  curl -s -X POST https://slack.com/api/conversations.history \
+    -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+    -H "Content-Type: application/json" \
+    --data '{"channel":"#council-ops","limit":20}'
   ```
 - **Storing Slack thread IDs**: persist `slack_message_ts` and `slack_thread_ts` in session metadata for follow-up posts.
 

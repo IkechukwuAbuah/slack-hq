@@ -38,7 +38,7 @@ This guide walks through the manual steps required to enable Linear's GitHub and
 6. Invite Council Bot to the channel:
    - In #council-core, type: `/invite @Council Bot`
    - Or click channel name → Integrations → Add apps → Council Bot
-7. **Note the channel ID** (format: C0XXXXXXXXX)
+7. **Note the channel ID** (format: `C` + 10 alphanumeric; current workspace value `C09QAKDHKMG`)
    - Click channel name → scroll to bottom → copy Channel ID
    - **Save this ID** - you'll need it for documentation
 

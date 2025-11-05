@@ -1,56 +1,60 @@
 ---
-description: Start a new session to track agent activities and collaboration
+description: Start a new session using session-tracker-2 subagent with direct Slack MCP integration
 tags: [session, tracking, project]
 ---
 
 # Start New Session
 
-Start a new session to track your work, activities, and progress in the slack-hq workspace.
+Start a new session using the **session-tracker-2 subagent** to track your work and progress.
 
 ## Task
 
-1. **Load the session-tracking skill** - Use the session-tracking skill for implementation details
-2. **Generate session data** with:
-   - Unique UUID for session_id
-   - Current ISO8601 timestamp
-   - Agent name (from environment or "Claude Code")
-   - Task name from user input
-   - Project: "slack-hq"
-   - Working directory: current directory
-   - Status: "active"
-   - Empty activities array
+**This command MUST use the session-tracker-2 subagent - NOT the old session-tracker agent (v1), shell scripts, or session-tracking skill.**
 
-3. **Execute session start script**:
-   ```bash
-   ~/.claude/skills/session-tracking/scripts/session.sh start "Task Name" [--auto-post] [--channel #council-ops]
+1. **Launch session-tracker-2 subagent**:
+   ```
+   Use Task tool with subagent_type="session-tracker-2"
    ```
 
-4. **Validate against schema**:
-   - Use schema at `~/.claude/skills/session-tracking/scripts/session-schema.json`
-   - Ensure all required fields are present
+2. **Provide context to subagent**:
+   ```
+   Operation: start_session
+   Description: "[user provided description]"
+   Auto Post: [true/false if --auto-post flag provided]
+   Channel: [if --channel flag provided, default: C09QAKDHKMG]
+   Project: "slack-hq"
+   Working Directory: [current directory]
+   ```
 
-5. **Persist session**:
-   - Save to `.claude/data/sessions/<uuid>.json`
-   - Create directory if needed
+3. **Subagent will handle EVERYTHING (including Slack posting)**:
+   - Generating UUID v4 for session_id
+   - Creating ISO8601 timestamps
+   - Building complete session JSON structure
+   - Validating against schema
+   - Persisting to `.claude/data/sessions/{uuid}.json`
+   - Creating directories if needed
+   - **DIRECTLY posting to Slack** via `mcp__slack__slack_post_message` (if auto-post enabled)
+   - Storing message_ts for threading
 
-6. **Report to user**:
-   - Session ID
+4. **Expected subagent output**:
+   - Session ID (UUID)
    - Started at timestamp
-   - Task name
-   - Auto-post status (if enabled)
+   - Task description
+   - File path where session is stored
+   - Slack post confirmation with message URL (if auto-post enabled)
 
 ## Parameters
 
 - Task name (required): Brief description of what you're working on
 - `--auto-post`: Automatically post to Slack when session starts
-- `--channel`: Slack channel for posting (default: #council-ops)
+- `--channel`: Slack channel for posting (default: #council-core)
 
 ## Example
 
 ```bash
 /session-start "Implement user authentication"
 /session-start "Fix API rate limiting" --auto-post
-/session-start "Deploy to staging" --auto-post --channel #deployments
+/session-start "Deploy to staging" --auto-post --channel #automation
 ```
 
 ## Success Criteria

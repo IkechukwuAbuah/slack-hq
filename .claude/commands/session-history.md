@@ -9,14 +9,20 @@ List recent sessions with optional filtering by status, agent, date range, or se
 
 ## Task
 
-1. **Load the session-tracking skill** - Use for implementation details
+**This command uses the session-tracker-2 subagent.**
 
-2. **Execute history script**:
-   ```bash
-   ~/.claude/skills/session-tracking/scripts/session.sh history [--limit N] [--status active|completed|paused] [--agent name] [--since YYYY-MM-DD]
+1. **Launch session-tracker-2 subagent**:
+   ```
+   Use Task tool with subagent_type="session-tracker-2"
+   Operation: history
+   Limit: [if --limit provided]
+   Status: [if --status provided]
+   Agent: [if --agent provided]
+   Since: [if --since provided]
+   Search: [if --search provided]
    ```
 
-3. **Scan session files**:
+2. **Subagent scans session files**:
    - Read all JSON files from `.claude/data/sessions/`
    - Parse and validate each session
    - Sort by started_at (most recent first)

@@ -9,14 +9,16 @@ Display comprehensive details about a specific session including all activities,
 
 ## Task
 
-1. **Load the session-tracking skill** - Use for implementation details
+**This command uses the session-tracker-2 subagent.**
 
-2. **Execute show script**:
-   ```bash
-   ~/.claude/skills/session-tracking/scripts/session.sh show <session-id>
+1. **Launch session-tracker-2 subagent**:
+   ```
+   Use Task tool with subagent_type="session-tracker-2"
+   Operation: show_session
+   Session ID: [user provided ID]
    ```
 
-3. **Load session data**:
+2. **Subagent loads session data**:
    - Read JSON from `.claude/data/sessions/<session-id>.json`
    - Validate session exists
    - Parse and validate against schema

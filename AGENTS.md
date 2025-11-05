@@ -48,17 +48,32 @@ Council Bot exposes Slack capabilities to all agents (Claude Code, Codex, ChatGP
 
 ### Usage Pattern for Agents
 
-**Ensure `SLACK_BOT_TOKEN` is available in the agent's runtime**, then:
+**Default to Slack MCP tools for all workspace operations.** Examples:
+
+> ⚠️ **Codex limitation:** The Codex CLI cannot access Slack MCP tools in this environment. When you are operating as Codex, fall back to the Slack Web API workflow described below.
+
+```javascript
+// Post an update (preferred)
+mcp__slack__slack_post_message({
+  channel_id: "C09QAKDHKMG",
+  text: "Automated update from Codex"
+});
+
+// Reply in an existing thread
+mcp__slack__slack_reply_to_thread({
+  channel_id: "C09QAKDHKMG",
+  thread_ts: "1730659852.123456",
+  text: "Follow-up context"
+});
+```
+
+**Fallback (when MCP is unavailable):** Use the Web API directly with curl. The Slack CLI v3.9.0 does **not** support `slack api …` commands.
 
 ```bash
-# CLI approach (shell out)
-slack api chat.postMessage --data '{"channel":"#council-ops","text":"Automated update"}' --token "$SLACK_BOT_TOKEN"
-
-# Or call Slack Web API directly over HTTPS
 curl -X POST https://slack.com/api/chat.postMessage \
   -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"channel":"#council-ops","text":"Automated update"}'
+  -d '{"channel":"C09Q761LJUD","text":"Automated update"}'
 ```
 
 ### Typical Flows
@@ -193,12 +208,15 @@ Every session completion MUST include the `--post` flag to ensure Council visibi
 
 | Work Type | Channel | Channel ID |
 |-----------|---------|------------|
+| Session tracking (automated) | #council-core | C09QAKDHKMG |
 | General updates | #announcements | C09Q8KCGM9C |
 | Engineering | #engineering | C09QAL92HFC |
 | Design/UX | #design-lab | C09QALF8WD8 |
-| Operations | #ops | C09Q761LJUD |
+| Operations | #council-ops | C09Q761LJUD |
 | Documentation | #docs | C09Q76ULRHB |
 | Deployments | #automation | C09R4SCGR24 |
+
+**Note:** #council-core is the default channel for session tracking (automated updates), while #announcements is reserved for major human-initiated broadcasts.
 
 **Broadcasting Requirements:**
 

@@ -1,44 +1,49 @@
 ---
-description: Stop the current or specified session and optionally post to Slack
+description: Stop session using session-tracker-2 subagent with direct Slack MCP posting
 tags: [session, tracking, project]
 ---
 
 # Stop Session
 
-Stop the current active session or a specific session by ID, marking it as completed.
+Stop the current active session or a specific session. Uses **session-tracker-2 subagent** which handles EVERYTHING including Slack posting.
 
 ## Task
 
-1. **Load the session-tracking skill** - Use for implementation details
+**Architecture: Subagent stops session AND posts to Slack directly (if --post)**
 
-2. **Identify session to stop**:
-   - If session ID provided: use that session
-   - If no ID: find the most recent active session
-   - Error if no active session found
-
-3. **Execute session stop script**:
-   ```bash
-   ~/.claude/skills/session-tracking/scripts/session.sh stop <session-id> [--notes "Summary"] [--post]
+1. **Launch session-tracker-2 subagent**:
+   ```
+   Use Task tool with subagent_type="session-tracker-2"
+   Operation: stop_session
+   Session ID: [provided or "active"]
+   Notes: "[user provided notes]"
+   Post to Slack: [true if --post flag provided]
    ```
 
-4. **Update session data**:
+2. **Subagent handles EVERYTHING**:
+   - Load session from `.claude/data/sessions/{uuid}.json`
    - Set `ended_at` to current ISO8601 timestamp
    - Set `status` to "completed"
-   - Add notes if provided
-   - Calculate duration
+   - Calculate accurate duration from start/end times
+   - Add notes to final activity if provided
+   - Persist updated session JSON
+   - **If --post flag: DIRECTLY post to Slack** using `mcp__slack__slack_post_message`
+   - Build Block Kit message with:
+     - Status emoji and description
+     - Agent, duration, completion time
+     - Activities list
+     - Handoff info (if applicable)
+     - Tags and Linear links
+   - Store `slack_message_ts` in session JSON for threading
+   - Return complete session summary
 
-5. **Optional Slack posting** (if --post flag used):
-   - Check SLACK_BOT_TOKEN is set
-   - Format session summary with Block Kit
-   - Post to configured channel (or thread if continuation)
-   - Store message_ts for threading
-
-6. **Report to user**:
+4. **Final output**:
    - Session ID
-   - Task name
-   - Duration (started_at to ended_at)
-   - Activities count
-   - Slack post confirmation (if applicable)
+   - Task description
+   - Duration in hours and minutes (calculated from timestamps)
+   - Total activities logged
+   - Slack post confirmation with URL (if --post used)
+   - Updated session file path
 
 ## Parameters
 

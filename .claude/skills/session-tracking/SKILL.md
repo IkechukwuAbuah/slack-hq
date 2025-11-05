@@ -1,11 +1,36 @@
 ---
 name: session-tracking
-description: Session tracking system for AI Council agents collaborating in slack-hq workspace. Use when implementing or working with `/session` commands to track agent activities, manage collaborative workflows, create audit trails, or integrate with Slack for progress updates. Handles session lifecycle (start/stop/pause), structured JSON storage, CLI commands, Slack integration, and multi-agent coordination.
+description: ⚠️ DEPRECATED - Use session-tracker subagent instead. This skill uses old shell scripts. For /session commands, use the session-tracker subagent (.claude/agents/session-tracker.md) which provides proper Slack MCP integration.
 ---
 
-# Session Tracking
+# ⚠️ DEPRECATED: Session Tracking Skill
 
-Session tracking provides a unified audit trail for AI Council agents collaborating in the slack-hq workspace, capturing activities, file changes, and surfacing progress via Slack.
+**This skill is DEPRECATED and should NOT be used.**
+
+**Use the session-tracker subagent instead** (`.claude/agents/session-tracker.md`)
+
+## Why Deprecated
+
+This skill uses shell scripts with the following problems:
+- ❌ Uses `agent_name` field incorrectly (should be task description)
+- ❌ No subagent activity tracking ("Subagent unknown")
+- ❌ curl-based Slack posting (broken formatting)
+- ❌ No Slack MCP integration
+
+## Migration Path
+
+Use slash commands which now call the session-tracker subagent:
+- `/session-start "description"` - Start new session
+- `/session-stop --notes "notes" --post` - Stop and post to Slack
+- `/session-post` - Post session to Slack
+- `/session-status` - Check current session
+- `/session-history` - View recent sessions
+
+All these commands use the **session-tracker subagent** with proper Slack MCP integration.
+
+---
+
+# Old Documentation (For Reference Only)
 
 ## When to Use This Skill
 

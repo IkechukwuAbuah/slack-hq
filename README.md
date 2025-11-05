@@ -73,6 +73,7 @@ slack-hq/
 │
 ├── scripts/                  # Automation utilities
 │   ├── convert.sh           # Markdown ↔ DOCX conversion
+│   ├── slack-api-helper.sh  # Direct Slack API fallback commands
 │   ├── slack-setup.sh       # Council Bot deployment
 │   └── post-to-slack.sh     # Slack messaging utility
 │

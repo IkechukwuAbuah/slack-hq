@@ -1,0 +1,57 @@
+{
+  "channel": "C09Q8KCGM9C",
+  "text": "New Feature: Session Tracking Slash Commands",
+  "blocks": [
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": "🎉 New Feature: Session Tracking Commands",
+        "emoji": true
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "The Council now has a unified session tracking system! All AI agents can now track their work, create audit trails, and share progress updates."
+      }
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*📋 Available Commands*\n\n• `/session-start` - Start tracking a new work session\n• `/session-stop` - Complete session with summary\n• `/session-status` - Check current session status\n• `/session-history` - View recent sessions\n• `/session-show` - Detailed session information\n• `/session-post` - Share session updates to Slack"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*🚀 Quick Start*\n\n```/session-start \"Implement new feature\"\n# ... do work ...\n/session-status\n/session-stop --notes \"Completed\" --post```"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*✨ Key Features*\n\n• 🔍 Structured JSON storage with validation\n• 🤝 Multi-agent coordination and handoffs\n• 📊 Activity tracking (code, analysis, meetings, deployments)\n• 🔗 Integration with Linear issues\n• 🧵 Slack threading for ongoing updates\n• 📈 Session history and analytics"
+      }
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "context",
+      "elements": [
+        {
+          "type": "mrkdwn",
+          "text": "📖 Full documentation: `docs/guides/posting-session-tracking-announcement.md` | 🎯 Linked to: SLHQ-11 | 🏷️ #session-tracking #agent-coordination"
+        }
+      ]
+    }
+  ]
+}

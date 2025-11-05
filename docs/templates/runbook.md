@@ -372,7 +372,7 @@ aws cloudwatch get-metric-statistics --namespace "Service/Name" \
 **Deployment Steps**:
 ```bash
 # 1. Announce deployment
-# Post in #deployments channel
+# Post in #automation channel
 
 # 2. Create deployment branch
 git checkout -b deploy/YYYY-MM-DD-service-name
@@ -715,7 +715,7 @@ curl https://api.stripe.com/v1/health
 
 ### Communication Channels
 - **Incidents**: #incidents (Slack)
-- **Deployments**: #deployments (Slack)
+- **Deployments**: #automation (Slack)
 - **Team**: #team-name (Slack)
 - **Status Page**: [URL]
 

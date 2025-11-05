@@ -1,0 +1,198 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://slack-hq.local/schemas/session.json",
+  "title": "Session",
+  "description": "AI Council session tracking data structure for session-tracker-2 agent",
+  "type": "object",
+  "required": [
+    "session_id",
+    "agent",
+    "started_at",
+    "project",
+    "working_directory",
+    "status",
+    "description"
+  ],
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "description": "Unique session identifier (UUIDv4)"
+    },
+    "agent": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "description": "Name or identifier of the AI agent (e.g., 'claude-code', 'codex', 'gemini')"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Session start timestamp (ISO8601 UTC format: YYYY-MM-DDTHH:MM:SSZ)"
+    },
+    "ended_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Session end timestamp (ISO8601 UTC)"
+    },
+    "duration_minutes": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "description": "Total session duration in minutes (calculated from timestamps)"
+    },
+    "project": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Project identifier (e.g., 'slack-hq')"
+    },
+    "working_directory": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Absolute path to working directory"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "paused", "completed", "failed"],
+      "description": "Current session status"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "description": "Brief description of the session's purpose or task"
+    },
+    "activities": {
+      "type": "array",
+      "description": "Chronological log of session activities",
+      "default": [],
+      "items": {
+        "type": "object",
+        "required": ["timestamp", "type", "summary"],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Activity timestamp (ISO8601 UTC)"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["code", "analysis", "meeting", "deployment", "handoff"],
+            "description": "Activity category"
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500,
+            "description": "Brief activity description"
+          },
+          "details": {
+            "type": "string",
+            "maxLength": 2000,
+            "description": "Extended activity details"
+          },
+          "files": {
+            "type": "array",
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "description": "Files involved in activity"
+          },
+          "tools": {
+            "type": "array",
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "description": "Tools used in activity (Write, Edit, Bash, etc.)"
+          },
+          "subagent": {
+            "type": "string",
+            "default": "claude-code",
+            "description": "Name of the agent that performed this activity"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "handoff_status": {
+      "type": "object",
+      "required": ["state"],
+      "description": "Multi-agent handoff coordination",
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": ["none", "requested", "transferred"],
+          "description": "Current handoff state"
+        },
+        "assignee": {
+          "type": ["string", "null"],
+          "description": "Target agent for handoff"
+        },
+        "notes": {
+          "type": ["string", "null"],
+          "description": "Handoff context and instructions"
+        },
+        "timestamp": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "When the handoff occurred (ISO8601 UTC)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "slack_config": {
+      "type": "object",
+      "description": "Slack integration configuration",
+      "required": ["channel", "auto_post"],
+      "properties": {
+        "channel": {
+          "type": "string",
+          "pattern": "^C[A-Z0-9]+$",
+          "description": "Slack channel ID (e.g., 'C09QAKDHKMG')"
+        },
+        "auto_post": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically post updates to Slack"
+        },
+        "thread_ts": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9]+\\.[0-9]+$",
+          "description": "Slack thread timestamp for threaded updates"
+        }
+      },
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional session metadata",
+      "properties": {
+        "tags": {
+          "type": "array",
+          "default": [],
+          "description": "Categorization tags",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+          }
+        },
+        "linear_ids": {
+          "type": "array",
+          "default": [],
+          "description": "Related Linear issue IDs",
+          "items": {
+            "type": "string",
+            "pattern": "^SLHQ-[0-9]+$"
+          }
+        },
+        "project": {
+          "type": "string",
+          "description": "Project identifier (duplicate for compatibility)"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

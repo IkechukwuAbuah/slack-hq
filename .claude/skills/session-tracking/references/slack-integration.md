@@ -137,7 +137,7 @@ Triggered explicitly via `/session post`:
 ./scripts/session.sh post --id <session-id>
 ```
 
-Reads `slack_channel` from session metadata (default: `#council-ops`).
+Reads `slack_channel` from session metadata (default: `#council-core`).
 
 ### Automatic Posting
 
