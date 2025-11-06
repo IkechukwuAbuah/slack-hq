@@ -188,6 +188,10 @@ curl -X GET "https://slack.com/api/conversations.list?types=public_channel" \
 
 **Note:** Direct API calls require proper environment setup and token configuration.
 
+### Secret Handling
+
+Keep the Council Bot credentials out of git and shared logs. Copy `.env.example` to `.env`, fill in real values locally, and ensure `.env` stays untracked. Never create backup variants like `.env.backup` or `.env.backup.*`; if they touch git, remove them with `git rm --cached`, rewrite history to purge them, and rotate every exposed token (bot, user, app-level, signing secret). Before opening a branch or PR run a secret scanner such as `gitleaks detect`, and regenerate any credential that leaks into repositories, logs, or chat transcripts.
+
 ## Development Workflows
 
 ### Session Tracking

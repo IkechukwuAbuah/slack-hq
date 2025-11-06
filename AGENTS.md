@@ -390,4 +390,4 @@ Use Task tool with subagent_type="tool-registry-manager"
 
 ## Security & Configuration Tips
 
-Store workspace secrets in `.env`, never in version control. Supply `.env.example` with placeholder keys (`SLACK_BOT_TOKEN`, `SLACK_SIGNING_SECRET`, `SLACK_APP_TOKEN`, `SLACK_WORKSPACE_ID`). Validate environment variables at startup and gate any production toggles behind feature flags so agents can exercise staging environments safely.
+Store workspace secrets in `.env`, never in version control. Supply `.env.example` with placeholder keys (`SLACK_BOT_TOKEN`, `SLACK_SIGNING_SECRET`, `SLACK_APP_TOKEN`, `SLACK_WORKSPACE_ID`). Validate environment variables at startup and gate any production toggles behind feature flags so agents can exercise staging environments safely. Never commit ad-hoc backups (`.env.backup`, `.env.backup.*`, etc.); scrub them with `git rm --cached` immediately if they appear and regenerate new credentials. Run a secret scanner (e.g., `gitleaks detect`) before opening PRs and rotate any credential that ever touches git history or chat transcripts.
